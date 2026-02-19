@@ -21,15 +21,15 @@ const Login = ({ setUser }) => {
 
             console.log("Login successful:", res.data);
 
-            // 1. Store Token and User in LocalStorage for persistence
+        
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));
 
-            // 2. Update the Global App State
+            
             setUser(res.data.user);
 
-            // 3. ROLE-BASED REDIRECTION
-            // This checks the 'role' field saved in your MongoDB
+            navigate('/')
+            
             if (res.data.user.role === 'faculty') {
                 console.log("Access Granted: Faculty Dashboard");
                 navigate('/faculty-dashboard');
@@ -41,10 +41,10 @@ const Login = ({ setUser }) => {
         } catch (err) {
             console.error("Login Error:", err);
             if (err.response) {
-                // Backend sent a specific error message (e.g., "Invalid Credentials")
+                
                 alert(err.response.data.message);
             } else {
-                // Server is likely offline
+                
                 alert("Server connection failed. Please check if your backend is running.");
             }
         } finally {
@@ -87,6 +87,7 @@ const Login = ({ setUser }) => {
 
                     <button 
                         type="submit" 
+                    
                         disabled={loading}
                         className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all ${
                             loading 

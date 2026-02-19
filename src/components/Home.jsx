@@ -23,7 +23,7 @@ const Home = ({ user }) => {
         </Link>
       </div>
       
-      {/* Conditional Rendering: Only show CourseList if user exists */}
+      
       <div className="w-full max-w-6xl mb-16">
         <h2 className="text-3xl font-bold mb-8 text-gray-800">Explore Our Courses</h2>
         

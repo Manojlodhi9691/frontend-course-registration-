@@ -29,7 +29,7 @@ const CourseDetails = ({ user }) => {
     }
     const token = localStorage.getItem('token');
     try {
-      // FIX: Added courseId to the request body so backend can block duplicate purchases
+      
       const orderRes = await axios.post('http://localhost:5000/api/payments/create-order', 
         { 
           amount: course.price,
@@ -70,7 +70,7 @@ const CourseDetails = ({ user }) => {
       };
       new window.Razorpay(options).open();
     } catch (err) {
-      // If the backend blocks the order (already enrolled), it will show here
+      
       alert(err.response?.data?.message || "Payment initiation failed.");
     }
   };

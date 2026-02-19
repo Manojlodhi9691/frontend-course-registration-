@@ -10,11 +10,11 @@ const CourseList = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get the saved token
+        const token = localStorage.getItem('token'); 
         
         const res = await axios.get('http://localhost:5000/api/courses', {
           headers: {
-            Authorization: `Bearer ${token}` // Pass token to backend
+            Authorization: `Bearer ${token}`
           }
         });
         

@@ -13,7 +13,7 @@ const CreateCourse = () => {
       await axios.post('http://localhost:5000/api/courses/create', formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      navigate('/dashboard'); // Go back to see the new course in the list
+      navigate('/dashboard'); 
     } catch (err) {
       alert("Error: " + (err.response?.data?.message || "Could not create course"));
     }

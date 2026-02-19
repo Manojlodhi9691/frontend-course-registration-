@@ -11,7 +11,7 @@ const StudentDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem('token');
-        // This endpoint should return the user object populated with enrolledCourses
+      
         const res = await axios.get('http://localhost:5000/api/courses/enrolled', {
           headers: { Authorization: `Bearer ${token}` }
         });

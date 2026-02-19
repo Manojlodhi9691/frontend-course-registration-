@@ -23,7 +23,7 @@ const FacultyDashboard = ({ user }) => {
         setCourses(res.data);
       } catch (err) {
         console.error("Error fetching faculty stats:", err);
-        // If token is invalid, clear storage and send to login
+      
         if (err.response?.status === 401 || err.response?.status === 403) {
           localStorage.removeItem('token');
           localStorage.removeItem('user');
@@ -37,7 +37,7 @@ const FacultyDashboard = ({ user }) => {
     fetchStats();
   }, [user, navigate]);
 
-  // Calculate Grand Totals using the fields we added to the backend
+  
   const totalStudents = courses.reduce((acc, curr) => acc + (curr.studentCount || 0), 0);
   const totalRevenue = courses.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
 
