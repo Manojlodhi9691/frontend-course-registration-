@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// 1. Grab the API URL from your frontend .env file
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Login = ({ setUser }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -14,22 +16,22 @@ const Login = ({ setUser }) => {
         console.log("Attempting login for:", email);
 
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', {
+            // 2. Use the dynamic variable for the POST request
+            const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
                 email,
                 password
             });
 
             console.log("Login successful:", res.data);
 
-        
+            // Save session data
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));
 
-            
+            // Update global state
             setUser(res.data.user);
 
-            navigate('/')
-            
+            // 3. Dynamic Navigation based on role
             if (res.data.user.role === 'faculty') {
                 console.log("Access Granted: Faculty Dashboard");
                 navigate('/faculty-dashboard');
@@ -41,11 +43,10 @@ const Login = ({ setUser }) => {
         } catch (err) {
             console.error("Login Error:", err);
             if (err.response) {
-                
                 alert(err.response.data.message);
             } else {
-                
-                alert("Server connection failed. Please check if your backend is running.");
+                // This message is helpful for debugging cloud connection issues!
+                alert("Server connection failed. Our backend might be sleeping (spinning up). Please try again in 30 seconds.");
             }
         } finally {
             setLoading(false);
@@ -54,7 +55,7 @@ const Login = ({ setUser }) => {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 shadow-2xl rounded-2xl border w-full max-w-md transform transition-all">
+            <div className="bg-white p-8 shadow-2xl rounded-2xl border w-full max-w-md">
                 <div className="text-center mb-8">
                     <h2 className="text-3xl font-extrabold text-gray-900">Welcome Back</h2>
                     <p className="text-gray-500 mt-2">Sign in to access your dashboard</p>
@@ -66,7 +67,7 @@ const Login = ({ setUser }) => {
                         <input 
                             type="email" 
                             placeholder="name@university.com" 
-                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" 
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -78,7 +79,7 @@ const Login = ({ setUser }) => {
                         <input 
                             type="password" 
                             placeholder="••••••••" 
-                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition" 
+                            className="w-full p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition" 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -87,7 +88,6 @@ const Login = ({ setUser }) => {
 
                     <button 
                         type="submit" 
-                    
                         disabled={loading}
                         className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all ${
                             loading 

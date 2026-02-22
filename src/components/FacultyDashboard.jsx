@@ -2,112 +2,104 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const FacultyDashboard = ({ user }) => {
-  const [courses, setCourses] = useState([]);
+// 1. Point this to your live Vercel Backend URL via .env
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const FacultyDashboard = () => {
+  const [myCourses, setMyCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Security Check
-    if (!user || user.role !== 'faculty') {
-      navigate('/login'); 
-      return;
-    }
-
-    const fetchStats = async () => {
+    const fetchFacultyData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5000/api/courses/faculty', {
+        
+        // 2. Fetch only courses created by this faculty member
+        const res = await axios.get(`${API_BASE_URL}/api/courses/faculty`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setCourses(res.data);
+        setMyCourses(res.data);
       } catch (err) {
-        console.error("Error fetching faculty stats:", err);
-      
-        if (err.response?.status === 401 || err.response?.status === 403) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          navigate('/login');
-        }
+        console.error("Error fetching faculty courses:", err);
+        // If unauthorized, send back to login
+        if (err.response?.status === 401) navigate('/login');
       } finally {
         setLoading(false);
       }
     };
+    fetchFacultyData();
+  }, [navigate]);
 
-    fetchStats();
-  }, [user, navigate]);
-
-  
-  const totalStudents = courses.reduce((acc, curr) => acc + (curr.studentCount || 0), 0);
-  const totalRevenue = courses.reduce((acc, curr) => acc + (curr.revenue || 0), 0);
-
-  if (loading) return <div className="p-8 text-center font-bold animate-pulse">Loading Faculty Data...</div>;
+  if (loading) return <div className="p-10 text-center text-xl font-bold animate-pulse text-indigo-600">Loading Instructor Studio...</div>;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <div className="max-w-7xl mx-auto p-6">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-10 bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Faculty Overview</h1>
-          <p className="text-gray-500 text-sm">Welcome back, {user?.name}</p>
+          <h1 className="text-4xl font-black text-gray-900">Instructor Studio</h1>
+          <p className="text-gray-500 mt-2 text-lg">Manage your curriculum and track student enrollment.</p>
         </div>
         <button 
           onClick={() => navigate('/create-course')}
-          className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg transform hover:scale-105"
+          className="mt-6 md:mt-0 bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 shadow-xl hover:shadow-indigo-200 transition-all active:scale-95 flex items-center gap-2"
         >
-          + Create New Course
+          <span className="text-2xl">+</span> Create New Course
         </button>
       </div>
-      
-      {/* STAT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-indigo-100">
-          <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Total Students</p>
-          <p className="text-5xl font-black text-indigo-600 mt-1">{totalStudents}</p>
+
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100">
+          <p className="text-indigo-600 font-bold uppercase text-xs tracking-wider">Active Courses</p>
+          <p className="text-3xl font-black text-indigo-900">{myCourses.length}</p>
         </div>
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-green-100">
-          <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Total Earnings</p>
-          <p className="text-5xl font-black text-green-600 mt-1">₹{totalRevenue.toLocaleString()}</p>
-        </div>
+        {/* You can add more stats here later like Total Students or Revenue */}
       </div>
 
-      {/* COURSE TABLE */}
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-        <div className="p-6 bg-gray-50 border-b">
-          <h2 className="font-bold text-gray-700">Course Performance</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">My Published Courses</h2>
+
+      {myCourses.length === 0 ? (
+        <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+          <p className="text-gray-500 text-lg">You haven't created any courses yet.</p>
+          <p className="text-gray-400 text-sm">Click the button above to get started!</p>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-white border-b">
-              <tr>
-                <th className="p-4 font-bold text-gray-400 text-xs uppercase">Course Name</th>
-                <th className="p-4 font-bold text-gray-400 text-xs uppercase text-center">Registrations</th>
-                <th className="p-4 font-bold text-gray-400 text-xs uppercase text-right">Revenue</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.length > 0 ? courses.map((course) => (
-                <tr key={course._id} className="border-b last:border-0 hover:bg-indigo-50/30 transition">
-                  <td className="p-4 font-semibold text-gray-800">{course.title}</td>
-                  <td className="p-4 text-center">
-                    <span className="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold">
-                      {course.studentCount}
-                    </span>
-                  </td>
-                  <td className="p-4 text-right font-bold text-gray-900">
-                    ₹{(course.revenue).toLocaleString()}
-                  </td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan="3" className="p-10 text-center text-gray-400 italic">
-                    No courses found. Start by creating one!
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {myCourses.map((course) => (
+            <div key={course._id} className="bg-white rounded-3xl shadow-md border border-gray-100 overflow-hidden hover:shadow-2xl transition-all group">
+              <div className="h-40 bg-gradient-to-br from-indigo-500 to-purple-600 p-6 flex items-end">
+                <h3 className="text-white text-xl font-bold line-clamp-2">{course.title}</h3>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-bold text-gray-400 uppercase tracking-tighter">
+                    Price: ₹{course.price}
+                  </span>
+                  <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-md font-bold">
+                    LIVE
+                  </span>
+                </div>
+                
+                <p className="text-gray-600 text-sm line-clamp-2 mb-6 h-10">
+                  {course.description}
+                </p>
+
+                <div className="flex gap-3">
+                  <button 
+                    onClick={() => navigate(`/courses/${course._id}`)}
+                    className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-bold hover:bg-gray-800 transition"
+                  >
+                    View Details
+                  </button>
+                  {/* Future Update: Add Edit/Delete buttons here */}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
+      )}
     </div>
   );
 };

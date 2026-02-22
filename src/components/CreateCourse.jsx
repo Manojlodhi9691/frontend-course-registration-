@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+// 1. Grab the API URL from your frontend .env file
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const CreateCourse = () => {
   const [formData, setFormData] = useState({ title: '', description: '', price: '' });
   const navigate = useNavigate();
@@ -10,9 +12,12 @@ const CreateCourse = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/courses/create', formData, {
+      
+      // 2. Use the variable instead of hardcoded localhost
+      await axios.post(`${API_BASE_URL}/api/courses/create`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       navigate('/dashboard'); 
     } catch (err) {
       alert("Error: " + (err.response?.data?.message || "Could not create course"));
@@ -23,10 +28,31 @@ const CreateCourse = () => {
     <div className="p-8 max-w-lg mx-auto bg-white shadow-lg rounded-xl mt-10">
       <h2 className="text-2xl font-bold mb-6">Add New Course</h2>
       <form onSubmit={onSubmit} className="space-y-4">
-        <input name="title" placeholder="Course Title" onChange={e => setFormData({...formData, title: e.target.value})} className="w-full p-2 border rounded" required />
-        <input name="price" type="number" placeholder="Price" onChange={e => setFormData({...formData, price: e.target.value})} className="w-full p-2 border rounded" required />
-        <textarea name="description" placeholder="Description" onChange={e => setFormData({...formData, description: e.target.value})} className="w-full p-2 border rounded" required />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded font-bold">Publish</button>
+        <input 
+          name="title" 
+          placeholder="Course Title" 
+          onChange={e => setFormData({...formData, title: e.target.value})} 
+          className="w-full p-2 border rounded" 
+          required 
+        />
+        <input 
+          name="price" 
+          type="number" 
+          placeholder="Price" 
+          onChange={e => setFormData({...formData, price: e.target.value})} 
+          className="w-full p-2 border rounded" 
+          required 
+        />
+        <textarea 
+          name="description" 
+          placeholder="Description" 
+          onChange={e => setFormData({...formData, description: e.target.value})} 
+          className="w-full p-2 border rounded" 
+          required 
+        />
+        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded font-bold hover:bg-blue-700 transition">
+          Publish Course
+        </button>
       </form>
     </div>
   );

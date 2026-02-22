@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
+// 1. Grab the API URL from your frontend .env file
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,8 @@ const CourseList = () => {
       try {
         const token = localStorage.getItem('token'); 
         
-        const res = await axios.get('http://localhost:5000/api/courses', {
+        // 2. Use the variable instead of hardcoded localhost
+        const res = await axios.get(`${API_BASE_URL}/api/courses`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -38,12 +41,12 @@ const CourseList = () => {
 
   if (error) return <p className="text-red-500 font-semibold">{error}</p>;
 
-  if (courses.length === 0) return <p className="text-gray-500 italic">No courses available. Faculty needs to add some!</p>;
+  if (courses.length === 0) return <p className="text-gray-500 italic text-center p-10">No courses available. Faculty needs to add some!</p>;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {courses.map((course) => (
-        <div key={course._id} className="bg-white p-6 rounded-xl shadow-md border border-gray-100 text-left hover:shadow-lg transition-shadow">
+        <div key={course._id} className="bg-white p-6 rounded-xl shadow-md border border-gray-100 flex flex-col text-left hover:shadow-lg transition-shadow">
           <h3 className="text-xl font-bold text-gray-800 mb-2">{course.title}</h3>
           <p className="text-gray-500 text-sm mb-4 italic">
             Instructor: <span className="text-gray-700 font-medium">{course.faculty?.name || 'Academic Staff'}</span>
