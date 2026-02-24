@@ -56,7 +56,7 @@ const CourseDetails = ({ user }) => {
 
       // STEP 2: Configure Razorpay Options
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Use Environment Variable
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use Environment Variable
         amount,
         currency,
         name: "Academy Portal",
