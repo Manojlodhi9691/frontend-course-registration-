@@ -23,7 +23,8 @@ function App() {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
-      const res = await axios.get('http://localhost:5000/api/auth/me', {
+      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser(res.data);
