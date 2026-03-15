@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-// The URL will change automatically between Localhost and your Cloud URL (Render)
 const  API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const CourseDetails = ({ user }) => {
@@ -15,7 +14,6 @@ const CourseDetails = ({ user }) => {
     const fetchCourse = async () => {
       try {
         const token = localStorage.getItem('token');
-        // Fetching course details with optional Auth header to check enrollment status
         const res = await axios.get(`${API_BASE_URL}/api/courses/${id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
@@ -43,7 +41,7 @@ const CourseDetails = ({ user }) => {
     }
 
     try {
-      // STEP 1: Create Order on Backend
+      
       const orderRes = await axios.post(`${API_BASE_URL}/api/payments/create-order`, 
         { 
           amount: course.price,
@@ -54,9 +52,9 @@ const CourseDetails = ({ user }) => {
 
       const { amount, id: order_id, currency } = orderRes.data;
 
-      // STEP 2: Configure Razorpay Options
+      
       const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use Environment Variable
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
         amount,
         currency,
         name: "Academy Portal",
@@ -64,13 +62,13 @@ const CourseDetails = ({ user }) => {
         order_id, 
         handler: async function (response) {
           try {
-            // STEP 3: Verify Payment Signature on Backend
+            
             const verifyRes = await axios.post(`${API_BASE_URL}/api/payments/verify`, response, {
               headers: { Authorization: `Bearer ${token}` }
             });
 
             if (verifyRes.data.success) {
-              // STEP 4: Finalize Enrollment
+              
               await axios.post(`${API_BASE_URL}/api/courses/enroll`, 
                 { courseId: id }, 
                 { headers: { Authorization: `Bearer ${token}` }}

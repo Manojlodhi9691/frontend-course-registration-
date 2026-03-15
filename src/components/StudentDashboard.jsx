@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 1. Grab the API URL from your frontend .env file
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const StudentDashboard = () => {
@@ -15,14 +14,14 @@ const StudentDashboard = () => {
       try {
         const token = localStorage.getItem('token');
         
-        // 2. Use the dynamic variable for the GET request
+        
         const res = await axios.get(`${API_BASE_URL}/api/courses/enrolled`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setEnrolledCourses(res.data);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
-        // If the token is invalid or expired, we might want to alert the user
+        
         if (err.response?.status === 401) {
           navigate('/login');
         }
@@ -56,7 +55,7 @@ const StudentDashboard = () => {
         <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
           <p className="text-gray-500 text-lg">You haven't bought any courses yet.</p>
           <button 
-            onClick={() => navigate('/')} // Navigating to home/course list
+            onClick={() => navigate('/')} 
             className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition"
           >
             Browse Catalog

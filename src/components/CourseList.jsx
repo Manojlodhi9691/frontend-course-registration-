@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-// 1. Grab the API URL from your frontend .env file
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -14,7 +14,7 @@ const CourseList = () => {
       try {
         const token = localStorage.getItem('token'); 
         
-        // 2. Use the variable instead of hardcoded localhost
+        
         const res = await axios.get(`${API_BASE_URL}/api/courses`, {
           headers: {
             Authorization: `Bearer ${token}`

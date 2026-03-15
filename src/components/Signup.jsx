@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 1. Grab the API URL from your frontend .env file
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const Signup = () => {
@@ -14,7 +14,7 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 2. Use the dynamic variable for the POST request
+      
       await axios.post(`${API_BASE_URL}/api/auth/signup`, formData);
       alert("Registration successful! Please login.");
       navigate('/login');

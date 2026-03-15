@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-// 1. Grab the API URL from your frontend .env file
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const Login = ({ setUser }) => {
     const [email, setEmail] = useState('');
@@ -16,7 +16,7 @@ const Login = ({ setUser }) => {
         console.log("Attempting login for:", email);
 
         try {
-            // 2. Use the dynamic variable for the POST request
+            
             const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
                 email,
                 password
@@ -24,14 +24,14 @@ const Login = ({ setUser }) => {
 
             console.log("Login successful:", res.data);
 
-            // Save session data
+            
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('user', JSON.stringify(res.data.user));
 
-            // Update global state
+        
             setUser(res.data.user);
 
-            // 3. Dynamic Navigation based on role
+            
             if (res.data.user.role === 'faculty') {
                 console.log("Access Granted: Faculty Dashboard");
                 navigate('/faculty-dashboard');
@@ -45,7 +45,7 @@ const Login = ({ setUser }) => {
             if (err.response) {
                 alert(err.response.data.message);
             } else {
-                // This message is helpful for debugging cloud connection issues!
+                
                 alert("Server connection failed. Our backend might be sleeping (spinning up). Please try again in 30 seconds.");
             }
         } finally {

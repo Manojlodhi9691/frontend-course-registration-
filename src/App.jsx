@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
-// Imports...
+// Existing Imports
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Login from './components/Login';
@@ -12,18 +12,24 @@ import FacultyDashboard from './components/FacultyDashboard';
 import CourseDetails from './components/CourseDetails';
 import CreateCourse from './components/CreateCourse';
 
+// 1. ADD THIS NEW IMPORT
+import Courses from './components/Courses'; 
+
 function App() {
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+        return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+        return null;
+    }
   });
 
-  // This is the part that might be causing the crash if typed incorrectly
   const fetchData = async () => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
-      const API_BASE_URL = import.meta.env.VITE_API_URL;
+      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
       const res = await axios.get(`${API_BASE_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -31,6 +37,7 @@ function App() {
       localStorage.setItem('user', JSON.stringify(res.data));
     } catch (err) {
       console.error("Session expired or server down");
+      handleLogout(); // Automatically log out if session is invalid
     }
   };
 
@@ -49,12 +56,19 @@ function App() {
       <Navbar user={user} onLogout={handleLogout} />
       <div className="min-h-screen bg-gray-50">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<Home user={user} />} />
+          
+          {/* 2. ADD THIS NEW PUBLIC ROUTE */}
+          <Route path="/courses" element={<Courses />} /> 
+          
           <Route path="/signup" element={<Signup />} />
           <Route 
             path="/login" 
             element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} 
           />
+
+          {/* Private Routes */}
           <Route 
             path="/dashboard" 
             element={
@@ -65,10 +79,16 @@ function App() {
               ) : <Navigate to="/login" />
             } 
           />
+          
           <Route 
-          path="/course/:id" 
-          element={<CourseDetails user={user} />} />
-          <Route path="/create-course" element={<CreateCourse />} />
+            path="/course/:id" 
+            element={<CourseDetails user={user} />} 
+          />
+          
+          <Route 
+            path="/create-course" 
+            element={user?.role === 'faculty' ? <CreateCourse /> : <Navigate to="/" />} 
+          />
         </Routes>
       </div>
     </Router>

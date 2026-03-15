@@ -14,14 +14,14 @@ const FacultyDashboard = () => {
       try {
         const token = localStorage.getItem('token');
         
-        // 2. Fetch only courses created by this faculty member
+        
         const res = await axios.get(`${API_BASE_URL}/api/courses/faculty`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMyCourses(res.data);
       } catch (err) {
         console.error("Error fetching faculty courses:", err);
-        // If unauthorized, send back to login
+        
         if (err.response?.status === 401) navigate('/login');
       } finally {
         setLoading(false);
@@ -54,7 +54,7 @@ const FacultyDashboard = () => {
           <p className="text-indigo-600 font-bold uppercase text-xs tracking-wider">Active Courses</p>
           <p className="text-3xl font-black text-indigo-900">{myCourses.length}</p>
         </div>
-        {/* You can add more stats here later like Total Students or Revenue */}
+      
       </div>
 
       <h2 className="text-2xl font-bold text-gray-800 mb-6">My Published Courses</h2>
@@ -93,7 +93,7 @@ const FacultyDashboard = () => {
                   >
                     View Details
                   </button>
-                  {/* Future Update: Add Edit/Delete buttons here */}
+                  
                 </div>
               </div>
             </div>
