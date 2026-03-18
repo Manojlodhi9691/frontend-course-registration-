@@ -106,7 +106,7 @@ const CourseDetails = ({ user }) => {
         {/* Header Section */}
         <div className="bg-indigo-600 p-8 text-white">
           <h1 className="text-4xl font-bold">{course.title}</h1>
-          <p className="mt-2 opacity-90">Instructor: {course.faculty?.name || 'Expert Instructor'}</p>
+          <p className="mt-2 opacity-90">Instructor: {course.instructor|| 'Expert Instructor'}</p>
         </div>
         
         {/* Content Section */}

@@ -52,7 +52,7 @@ const CourseList = () => {
           </div>
           
           <p className="text-gray-500 text-sm mb-6 line-clamp-2 italic">
-            By: <span className="text-gray-700 font-semibold">{course.faculty?.name || 'Academic Expert'}</span>
+            By: <span className="text-gray-700 font-semibold">{course.instructor|| 'Academic Expert'}</span>
           </p>
           
           <div className="mt-auto flex justify-between items-center pt-5 border-t border-gray-50">
