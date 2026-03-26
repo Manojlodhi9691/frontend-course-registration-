@@ -9,6 +9,7 @@ const CourseDetails = ({ user }) => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -27,9 +28,25 @@ const CourseDetails = ({ user }) => {
     fetchCourse();
   }, [id]);
 
+  // Helper to ensure Razorpay is loaded (Fixes Laptop/Desktop silent blocks)
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const handleRazorpayPayment = async () => {
-    if (!window.Razorpay) {
-      alert("Razorpay SDK failed to load. Check your internet connection.");
+    const scriptLoaded = await loadRazorpay();
+    if (!scriptLoaded) {
+      alert("Razorpay SDK failed to load. Please check your internet or disable AdBlock.");
       return;
     }
 
@@ -41,6 +58,9 @@ const CourseDetails = ({ user }) => {
     }
 
     try {
+      setIsProcessing(true);
+
+      // 1. Create Order
       const orderRes = await axios.post(`${API_BASE_URL}/api/payments/create-order`, 
         { amount: course.price, courseId: id },
         { headers: { Authorization: `Bearer ${token}` }}
@@ -48,12 +68,13 @@ const CourseDetails = ({ user }) => {
 
       const { amount, id: order_id, currency } = orderRes.data;
 
+      // 2. Options Configuration
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
         amount,
         currency,
         name: "Academy Portal",
-        description: `Purchase ${course.title}`,
+        description: `Enrolling in ${course.title}`,
         order_id, 
         handler: async function (response) {
           try {
@@ -66,7 +87,7 @@ const CourseDetails = ({ user }) => {
                 { courseId: id }, 
                 { headers: { Authorization: `Bearer ${token}` }}
               );
-              alert("Payment Successful & Enrolled!");
+              alert("Payment Successful! Welcome to the course.");
               navigate('/dashboard');
             }
           } catch (error) {
@@ -74,113 +95,146 @@ const CourseDetails = ({ user }) => {
             alert("Payment verification failed.");
           }
         },
-        prefill: { name: user?.name || "", email: user?.email || "" },
+        prefill: { 
+          name: user?.name || "", 
+          email: user?.email || "" 
+        },
         theme: { color: "#4F46E5" },
+        modal: {
+          ondismiss: () => setIsProcessing(false)
+        }
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
+
     } catch (err) {
-      console.error("Payment Initiation Error:", err);
-      alert(err.response?.data?.message || "Payment initiation failed.");
+      console.error("Payment Error:", err);
+      alert(err.response?.data?.message || "Could not initiate payment.");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-center font-semibold">Loading Course Details...</div>;
-  if (!course) return <div className="p-8 text-center text-red-500">Course not found.</div>;
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    </div>
+  );
+  
+  if (!course) return <div className="p-8 text-center text-red-500 font-bold">Course not found.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 animate-fadeIn">
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
         
-        {/* Header Section */}
-        <div className="bg-indigo-600 p-10 text-white">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div>
-              <h1 className="text-4xl font-black">{course.title}</h1>
-              <p className="mt-2 text-indigo-100 flex items-center gap-2">
-                <span className="bg-indigo-500 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Instructor</span>
-                {course.faculty?.name || 'Expert Instructor'}
-              </p>
+        {/* Hero Header */}
+        <div className="bg-gradient-to-r from-indigo-600 to-blue-700 p-8 md:p-12 text-white">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="space-y-4">
+              <span className="bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                Course Details
+              </span>
+              <h1 className="text-4xl md:text-5xl font-black leading-tight">{course.title}</h1>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-indigo-400 rounded-full flex items-center justify-center font-bold">
+                  {course.faculty?.name?.charAt(0) || 'E'}
+                </div>
+                <p className="font-medium text-indigo-100 text-lg">
+                  By <span className="text-white font-bold">{course.faculty?.name || 'Expert Faculty'}</span>
+                </p>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20">
-              <p className="text-sm font-bold opacity-80 uppercase tracking-tighter">Current Price</p>
-              <p className="text-3xl font-black">₹{course.price}</p>
+            <div className="bg-white/10 backdrop-blur-xl p-6 rounded-3xl border border-white/20 text-center min-w-[200px]">
+              <p className="text-xs font-bold opacity-70 uppercase mb-1">Investment</p>
+              <p className="text-4xl font-black">₹{course.price}</p>
             </div>
           </div>
         </div>
-        
-        <div className="p-8 grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+        <div className="p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          {/* Main Content Column */}
-          <div className="lg:col-span-2 space-y-10">
-            {/* Description */}
+          {/* Main Info */}
+          <div className="lg:col-span-2 space-y-12">
             <section>
-              <h3 className="text-2xl font-bold mb-4 text-gray-900 border-l-4 border-indigo-600 pl-4">Course Overview</h3>
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                About this Course
+              </h3>
               <p className="text-gray-600 leading-relaxed text-lg">
-                {course.description || "Comprehensive curriculum designed for practical industry application."}
+                {course.description || "Learn industry-relevant skills with our comprehensive, hands-on curriculum designed by professionals."}
               </p>
             </section>
 
-            {/* Syllabus / Subjects */}
             <section>
-             
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {course.subjects?.length > 0 ? (
-                  course.subjects.map((sub, idx) => (
-                    <div key={idx} className="flex items-center gap-3 p-4 bg-indigo-50 rounded-xl border border-indigo-100 text-indigo-900 font-semibold">
-                      <span className="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">{idx + 1}</span>
-                      {sub}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-400 italic">Curriculum details coming soon.</p>
-                )}
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <span className="w-2 h-8 bg-indigo-600 rounded-full"></span>
+                Syllabus
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {course.subjects?.map((sub, idx) => (
+                  <div key={idx} className="flex items-center gap-4 p-5 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-200 transition-colors">
+                    <span className="text-indigo-600 font-black text-xl opacity-30">0{idx + 1}</span>
+                    <p className="font-bold text-gray-700">{sub}</p>
+                  </div>
+                ))}
               </div>
             </section>
           </div>
 
-          {/* Sidebar Column: Stats & Experience */}
-          <div className="space-y-6">
-            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-              <h4 className="font-bold text-gray-400 uppercase text-xs mb-4 tracking-widest">Instructor Expertise</h4>
-              <p className="text-gray-700 font-medium leading-relaxed italic">
-                "{course.instructorExperience || 'Subject Matter Expert with deep theoretical and practical knowledge.'}"
+          {/* Sidebar */}
+          <div className="space-y-8">
+            <div className="bg-indigo-50 p-8 rounded-3xl border border-indigo-100">
+              <h4 className="font-black text-indigo-900 mb-4 uppercase text-xs tracking-widest">Instructor Bio</h4>
+              <p className="text-indigo-800/80 leading-relaxed italic">
+                "{course.instructorExperience || 'Experienced professional dedicated to student success and practical learning.'}"
               </p>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
-              <h4 className="font-bold text-gray-900">Batch Information</h4>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Duration</span>
-                  <span className="font-bold text-gray-800">{course.duration || '8 Weeks'}</span>
+            <div className="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm space-y-6">
+              <h4 className="font-black text-gray-900 flex items-center gap-2">
+                🚀 Batch Details
+              </h4>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                  <span className="text-gray-500 font-medium text-sm">Duration</span>
+                  <span className="font-bold text-indigo-600">{course.duration || 'Flexible'}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Timing</span>
-                  <span className="font-bold text-gray-800">{course.batchTiming || 'Mon-Fri (Evening)'}</span>
+                <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+                  <span className="text-gray-500 font-medium text-sm">Schedule</span>
+                  <span className="font-bold text-gray-800">{course.batchTiming || 'Evening Batch'}</span>
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Dynamic Action Button */}
               <div className="pt-4">
                 {user?.role === 'faculty' ? (
-                  <div className="w-full text-center py-3 bg-gray-100 text-gray-500 rounded-xl font-bold cursor-not-allowed border border-gray-200">
-                    Faculty Dashboard Mode
-                  </div>
+                  <button disabled className="w-full bg-gray-200 text-gray-500 py-4 rounded-2xl font-bold cursor-not-allowed">
+                    Faculty View Only
+                  </button>
                 ) : course.isEnrolled ? (
                   <button 
                     onClick={() => navigate('/dashboard')}
-                    className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all"
+                    className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black shadow-xl hover:bg-indigo-700 transition transform active:scale-95"
                   >
-                    Go to Learning Library
+                    Continue Learning
                   </button>
                 ) : (
                   <button 
                     onClick={handleRazorpayPayment}
-                    className="w-full bg-green-600 text-white py-4 rounded-xl font-black shadow-lg shadow-green-100 hover:bg-green-700 hover:scale-[1.02] transition-all"
+                    disabled={isProcessing}
+                    className={`w-full py-4 rounded-2xl font-black shadow-2xl transition-all transform active:scale-95 flex justify-center items-center gap-2 ${
+                      isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
                   >
-                    Buy Now & Start Learning
+                    {isProcessing ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      'Enroll Now'
+                    )}
                   </button>
                 )}
               </div>

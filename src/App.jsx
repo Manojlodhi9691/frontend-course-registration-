@@ -11,6 +11,8 @@ import StudentDashboard from './components/StudentDashboard';
 import FacultyDashboard from './components/FacultyDashboard';
 import CourseDetails from './components/CourseDetails';
 import CreateCourse from './components/CreateCourse';
+import CourseContent from './components/CourseContent'; // Adjust path as needed
+import ManageLectures from './components/ManageLectures';
 
 // 1. ADD THIS NEW IMPORT
 import Courses from './components/Courses'; 
@@ -89,6 +91,8 @@ function App() {
             path="/create-course" 
             element={user?.role === 'faculty' ? <CreateCourse /> : <Navigate to="/" />} 
           />
+          <Route path="/course-content/:id" element={<CourseContent />} />
+          <Route path="/manage-lectures/:id" element={<ManageLectures />} />
         </Routes>
       </div>
     </Router>

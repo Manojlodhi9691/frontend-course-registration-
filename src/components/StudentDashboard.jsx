@@ -71,12 +71,12 @@ const StudentDashboard = () => {
                 <p className="text-gray-600 text-sm line-clamp-2 mb-4">
                   {course.description || "No description available."}
                 </p>
-                <button 
-                  onClick={() => navigate(`/course/${course._id}`)}
-                  className="w-full bg-gray-100 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors"
-                >
-                  View Content
-                </button>
+          <button 
+  onClick={() => navigate(`/course-content/${course._id}`)} // 👈 Changed from /course/ to /course-content/
+  className="w-full bg-gray-100 text-indigo-700 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-colors"
+>
+  View Content
+</button>
               </div>
             </div>
           ))}
