@@ -41,15 +41,23 @@ const CourseContent = () => {
       <div className="lg:col-span-2">
         <div className="bg-black rounded-3xl overflow-hidden shadow-2xl aspect-video mb-6">
           {activeVideo ? (
-            <iframe
-              width="100%"
-              height="100%"
-              src={`https://www.youtube.com/embed/${activeVideo.videoUrl}`}
-              title={activeVideo.title}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+            <div className="bg-black rounded-3xl overflow-hidden shadow-2xl aspect-video mb-6">
+  {activeVideo ? (
+    <video
+      key={activeVideo.videoUrl} // Key forces re-render when video changes
+      controls
+      controlsList="nodownload" // Prevents students from easily stealing your content
+      className="w-full h-full"
+    >
+      <source src={activeVideo.videoUrl} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  ) : (
+    <div className="h-full flex items-center justify-center text-white italic">
+      Select a lecture to start watching.
+    </div>
+  )}
+</div>
           ) : (
             <div className="h-full flex items-center justify-center text-white italic">
               No lectures uploaded yet.
@@ -57,7 +65,7 @@ const CourseContent = () => {
           )}
         </div>
         <h1 className="text-3xl font-black text-gray-900">{activeVideo?.title || course.title}</h1>
-        <p className="mt-4 text-gray-600 leading-relaxed">{course.description}</p>
+       
       </div>
 
       {/* Playlist Sidebar */}
