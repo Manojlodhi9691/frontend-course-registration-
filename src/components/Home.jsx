@@ -1,114 +1,151 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Home = ({ user }) => {
   return (
-    <div className="flex flex-col items-center bg-white">
-      {/* 1. Hero Section */}
-      <div className="flex flex-col items-center justify-center min-h-[75vh] text-center px-4 py-20 bg-gradient-to-b from-blue-50 to-white w-full">
-        <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 tracking-tight">
-          Master New Skills <br />
-          <span className="text-blue-600 font-black">At Your Own Pace</span>
-        </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mb-10 leading-relaxed">
-          The official MITS Academy portal. Explore professional courses, 
-          manage your registration, and handle fee payments securely.
-        </p>
+    <div className="flex flex-col items-center bg-gradient-to-br from-gray-900 via-gray-950 to-black text-gray-200">
+      {/* Hero Section */}
+      <section className="w-full min-h-screen flex flex-col justify-center items-center text-center px-6 relative overflow-hidden">
+        <div className="absolute w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-3xl -top-32 -left-32"></div>
+        <div className="absolute w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-3xl bottom-0 right-0"></div>
 
-        <div className="flex gap-4">
-          <Link 
-            to="/courses" 
-            className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-bold shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300"
+        <motion.h1
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-5xl md:text-7xl font-extrabold mb-6 leading-tight text-white"
+        >
+          Learn Without Limits <br />
+          <span className="bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+            Build Your Future
+          </span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-lg md:text-xl max-w-2xl text-gray-400 mb-10"
+        >
+          A modern learning platform by MITS Academy. Discover courses, upgrade skills, and accelerate your career.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="flex gap-4"
+        >
+          <Link
+            to="/courses"
+            className="px-10 py-4 rounded-2xl text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl hover:scale-105 transition"
           >
             Explore Courses
           </Link>
+
           {!user && (
-            <Link 
-              to="/signup" 
-              className="bg-white text-blue-600 border-2 border-blue-600 px-10 py-4 rounded-xl text-lg font-bold hover:bg-blue-50 transition-all duration-300"
+            <Link
+              to="/signup"
+              className="px-10 py-4 rounded-2xl text-lg font-semibold border border-gray-700 hover:bg-gray-800 transition"
             >
-              Sign Up Free
+              Get Started
             </Link>
           )}
-        </div>
-      </div>
+        </motion.div>
+      </section>
 
-      {/* 2. Stats Section */}
-      <div className="w-full py-16 bg-white border-y border-gray-100">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 px-6">
+      {/* Stats */}
+      <section className="w-full py-20">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 px-6">
           {[
-            { label: "Active Students", value: "2,500+" },
-            { label: "Total Courses", value: "120+" },
-            { label: "Expert Faculty", value: "85+" },
-            { label: "Success Rate", value: "99%" },
+            { label: 'Students', value: '2.5K+' },
+            { label: 'Courses', value: '120+' },
+            { label: 'Faculty', value: '85+' },
+            { label: 'Success', value: '99%' },
           ].map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-4xl font-black text-blue-600 mb-1">{stat.value}</div>
-              <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">{stat.label}</div>
+            <div
+              key={i}
+              className="bg-white/5 backdrop-blur-xl border border-gray-800 rounded-3xl p-8 text-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition"
+            >
+              <h3 className="text-3xl font-bold text-blue-400">{stat.value}</h3>
+              <p className="text-gray-400 text-sm mt-2">{stat.label}</p>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* 3. How It Works Section (Scroll Depth) */}
-      <div className="py-24 bg-gray-50 w-full">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Start Learning in 3 Steps</h2>
-            <p className="text-gray-500">Getting started at MITS Academy is simple and transparent.</p>
-          </div>
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+      {/* Steps */}
+      <section className="w-full py-24 bg-gradient-to-r from-gray-900 to-gray-950">
+        <div className="max-w-6xl mx-auto px-6 text-center">
+          <h2 className="text-4xl font-bold mb-12 text-white">How It Works</h2>
+
+          <div className="grid md:grid-cols-3 gap-10">
             {[
-              { step: "1", title: "Browse Catalog", desc: "View all available courses and their curriculum without an account." },
-              { step: "2", title: "Secure Payment", desc: "Choose your course and pay securely via Razorpay gateway." },
-              { step: "3", title: "Instant Access", desc: "Start learning immediately from your personalized dashboard." }
-            ].map((item, idx) => (
-              <div key={idx} className="flex-1 text-center group">
-                <div className="w-20 h-20 bg-white text-blue-600 rounded-2xl flex items-center justify-center text-3xl font-black mx-auto mb-6 shadow-md group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                  {item.step}
-                </div>
-                <h3 className="font-bold text-xl mb-3 text-gray-800">{item.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{item.desc}</p>
+              { title: 'Browse', desc: 'Explore courses freely before enrolling.' },
+              { title: 'Pay Securely', desc: 'Safe payments with Razorpay.' },
+              { title: 'Start Learning', desc: 'Instant access to dashboard.' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-md hover:shadow-xl transition"
+              >
+                <div className="text-4xl font-bold text-purple-400 mb-4">0{i + 1}</div>
+                <h3 className="text-xl font-semibold mb-2 text-white">{item.title}</h3>
+                <p className="text-gray-400">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* 4. FAQ Section */}
-      <div className="py-24 max-w-3xl mx-auto px-6 w-full">
-        <h2 className="text-4xl font-bold text-center mb-16">Common Questions</h2>
+      {/* FAQ */}
+      <section className="max-w-3xl mx-auto py-24 px-6">
+        <h2 className="text-4xl font-bold text-center mb-12 text-white">FAQs</h2>
+
         <div className="space-y-4">
           {[
-            { q: "Do I need to pay to see course details?", a: "No! You can browse our entire catalog and view course descriptions freely. You only pay when you decide to enroll." },
-            { q: "Is my payment data safe?", a: "We use 256-bit SSL encryption via Razorpay. We never store your card details on our servers." },
-            { q: "How do I access my courses?", a: "Once enrolled, all your courses appear in your Student Dashboard instantly." }
-          ].map((item, index) => (
-            <details key={index} className="group p-6 bg-white border border-gray-100 rounded-2xl cursor-pointer hover:border-blue-200 transition-all">
-              <summary className="font-bold text-gray-800 list-none flex justify-between items-center">
+            {
+              q: 'Can I view courses for free?',
+              a: 'Yes, you can explore all courses before enrolling.',
+            },
+            {
+              q: 'Is payment secure?',
+              a: 'Yes, we use Razorpay with SSL encryption.',
+            },
+            {
+              q: 'When do I get access?',
+              a: 'Immediately after successful payment.',
+            },
+          ].map((item, i) => (
+            <details
+              key={i}
+              className="group bg-gray-900 p-6 rounded-2xl shadow-sm border border-gray-800"
+            >
+              <summary className="cursor-pointer font-semibold flex justify-between text-white">
                 {item.q}
-                <span className="text-blue-600 group-open:rotate-180 transition-transform">↓</span>
+                <span className="group-open:rotate-180 transition">⌄</span>
               </summary>
-              <p className="text-gray-600 text-sm mt-4 leading-relaxed">{item.a}</p>
+              <p className="mt-4 text-gray-400">{item.a}</p>
             </details>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* 5. Final CTA Banner */}
-      <div className="w-full px-6 py-24 mb-10">
-        <div className="max-w-6xl mx-auto bg-blue-600 rounded-[3rem] p-16 text-center text-white shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-          <h2 className="text-5xl font-black mb-6 relative z-10">Ready to start?</h2>
-          <p className="text-blue-100 mb-10 text-xl relative z-10">Join 2,500+ students today.</p>
-          <Link 
-            to="/signup" 
-            className="bg-white text-blue-600 px-14 py-5 rounded-2xl font-black text-xl hover:shadow-2xl transition-all inline-block relative z-10"
+      {/* CTA */}
+      <section className="w-full py-24 px-6">
+        <div className="max-w-5xl mx-auto text-center bg-gradient-to-r from-purple-600 to-blue-600 text-white p-16 rounded-[2.5rem] shadow-2xl">
+          <h2 className="text-4xl font-bold mb-4">Start Your Journey Today</h2>
+          <p className="mb-8 text-lg text-gray-200">Join thousands of learners upgrading their skills.</p>
+
+          <Link
+            to="/signup"
+            className="bg-white text-gray-900 px-12 py-4 rounded-xl font-bold hover:scale-105 transition"
           >
-            Create Your Account
+            Create Account
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
