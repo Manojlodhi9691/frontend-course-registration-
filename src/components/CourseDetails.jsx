@@ -91,7 +91,7 @@ const CourseDetails = ({ user }) => {
   };
 
   if (loading) return (
-    <div className="flex justify-center items-center h-64 bg-black">
+    <div className="flex justify-center items-center h-screen bg-black">
       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
     </div>
   );
@@ -110,7 +110,7 @@ const CourseDetails = ({ user }) => {
 
         <div className="p-6 md:p-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
           
-          {/* Main */}
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-10">
             <section>
               <h3 className="text-2xl font-bold mb-4 text-white">About this Course</h3>
@@ -119,16 +119,35 @@ const CourseDetails = ({ user }) => {
               </p>
             </section>
 
-            <section>
-              <h3 className="text-2xl font-bold mb-4 text-white">Syllabus</h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {course.subjects?.map((sub, idx) => (
-                  <div key={idx} className="p-4 bg-gray-800 rounded-xl border border-gray-700">
-                    {sub}
-                  </div>
-                ))}
+            {/* --- NEW SECTION FOR INSTRUCTOR EXPERIENCE --- */}
+            <section className="p-6 bg-gray-800/50 rounded-2xl border border-gray-700">
+              <h3 className="text-2xl font-bold mb-4 text-white">Instructor Profile</h3>
+              <div className="flex items-start gap-4">
+                <div className="h-12 w-12 bg-indigo-500 rounded-full flex items-center justify-center text-xl font-bold">
+                  {course.faculty?.name?.charAt(0) || "F"}
+                </div>
+                <div>
+                  <p className="text-xl font-semibold text-indigo-400">{course.faculty?.name || "Instructor"}</p>
+                  <p className="text-gray-300 mt-2 italic">
+                    "{course.instructorExperience || course.faculty?.experience || "Expertise in the field with years of industry experience."}"
+                  </p>
+                </div>
               </div>
             </section>
+            {/* ---------------------------------------------- */}
+
+            {course.subjects && course.subjects.length > 0 && (
+              <section>
+                <h3 className="text-2xl font-bold mb-4 text-white">Curriculum</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {course.subjects.map((sub, idx) => (
+                    <div key={idx} className="p-4 bg-gray-800 rounded-xl border border-gray-700">
+                      {sub}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           {/* Sidebar */}
